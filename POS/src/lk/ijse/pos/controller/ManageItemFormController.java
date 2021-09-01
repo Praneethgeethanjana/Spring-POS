@@ -16,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.pos.AppInitializer;
+import lk.ijse.pos.bo.ItemBO;
 import lk.ijse.pos.bo.ItemBOImpl;
 import lk.ijse.pos.model.Item;
 import lk.ijse.pos.view.tblmodel.ItemTM;
@@ -36,6 +37,8 @@ import java.util.logging.Logger;
 
 public class ManageItemFormController implements Initializable {
 
+    private ItemBO itemBO=new ItemBOImpl();
+
     @FXML
     private JFXTextField txtItemCode;
     @FXML
@@ -51,7 +54,7 @@ public class ManageItemFormController implements Initializable {
 
     private boolean addNew = true;
 
-    ItemBOImpl itemBO=new ItemBOImpl();
+
 
     private void loadAllItems() {
 

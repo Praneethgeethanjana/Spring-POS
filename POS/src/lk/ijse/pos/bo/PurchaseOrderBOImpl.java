@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PurchaseOrderBOImpl {
+public class PurchaseOrderBOImpl implements PurchaseOrderBO{
 
     private final CustomerDAO customerDAO = new CustomerDAOImpl();
     private final ItemDAO itemDAO = new ItemDAOImpl();
     private final OrderDAO orderDAO = new OrderDAOImpl();
     private final OrderDetailsDAO orderDetailsDAO = new OrderDetailsDAOImpl();
 
-
+    @Override
     public boolean purchaseOrder(Orders order, ArrayList<OrderDetails> orderDetails) throws Exception {
         Connection connection=null;
 
