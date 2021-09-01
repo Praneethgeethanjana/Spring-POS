@@ -20,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import lk.ijse.pos.bo.BOFactory;
 import lk.ijse.pos.bo.custom.CustomerBO;
 import lk.ijse.pos.bo.custom.ItemBO;
 import lk.ijse.pos.bo.custom.PurchaseOrderBO;
@@ -50,7 +51,9 @@ import java.util.logging.Logger;
 public class OrderFormController implements Initializable {
 
 
-    private final PurchaseOrderBO purchaseOrderBO = new PurchaseOrderBOImpl();
+    CustomerBO customerBO = (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
+    ItemBO itemBO= (ItemBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ITEM);
+    PurchaseOrderBO purchaseOrderBO= (PurchaseOrderBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ORDER);
 
     @FXML
     private JFXComboBox<String> cmbCustomerID;
@@ -80,9 +83,6 @@ public class OrderFormController implements Initializable {
     private JFXDatePicker txtOrderDate;
 
 
-
-   private CustomerBO customerBO=new CustomerBOImpl();
-   private ItemBO itemBO = new ItemBOImpl();
 
 
     @Override
