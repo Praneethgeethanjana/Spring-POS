@@ -1,5 +1,6 @@
-package lk.ijse.pos.bo;
+package lk.ijse.pos.bo.custom.impl;
 
+import lk.ijse.pos.bo.custom.PurchaseOrderBO;
 import lk.ijse.pos.controller.OrderFormController;
 import lk.ijse.pos.dao.custom.CustomerDAO;
 import lk.ijse.pos.dao.custom.ItemDAO;
@@ -10,11 +11,9 @@ import lk.ijse.pos.dao.custom.impl.ItemDAOImpl;
 import lk.ijse.pos.dao.custom.impl.OrderDAOImpl;
 import lk.ijse.pos.dao.custom.impl.OrderDetailsDAOImpl;
 import lk.ijse.pos.db.DBConnection;
-import lk.ijse.pos.model.Customer;
 import lk.ijse.pos.model.Item;
 import lk.ijse.pos.model.OrderDetails;
 import lk.ijse.pos.model.Orders;
-import lk.ijse.pos.view.tblmodel.OrderDetailTM;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,9 +21,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PurchaseOrderBOImpl implements PurchaseOrderBO{
+public class PurchaseOrderBOImpl implements PurchaseOrderBO {
 
     private final CustomerDAO customerDAO = new CustomerDAOImpl();
+
     private final ItemDAO itemDAO = new ItemDAOImpl();
     private final OrderDAO orderDAO = new OrderDAOImpl();
     private final OrderDetailsDAO orderDetailsDAO = new OrderDetailsDAOImpl();
