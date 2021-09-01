@@ -1,100 +1,86 @@
 package lk.ijse.pos.bo.custom.impl;
 
 import lk.ijse.pos.bo.custom.PurchaseOrderBO;
-import lk.ijse.pos.controller.OrderFormController;
 import lk.ijse.pos.dao.DAOFactory;
-import lk.ijse.pos.dao.custom.CustomerDAO;
 import lk.ijse.pos.dao.custom.ItemDAO;
 import lk.ijse.pos.dao.custom.OrderDAO;
 import lk.ijse.pos.dao.custom.OrderDetailsDAO;
-import lk.ijse.pos.dao.custom.impl.CustomerDAOImpl;
-import lk.ijse.pos.dao.custom.impl.ItemDAOImpl;
-import lk.ijse.pos.dao.custom.impl.OrderDAOImpl;
-import lk.ijse.pos.dao.custom.impl.OrderDetailsDAOImpl;
 import lk.ijse.pos.db.DBConnection;
-import lk.ijse.pos.model.Item;
-import lk.ijse.pos.model.OrderDetails;
-import lk.ijse.pos.model.Orders;
+import lk.ijse.pos.dto.OrderDetailsDTO;
+import lk.ijse.pos.dto.OrdersDTO;
+import lk.ijse.pos.entity.Item;
+import lk.ijse.pos.entity.OrderDetails;
+import lk.ijse.pos.entity.Orders;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+/**
+ * @author : Sanu Vithanage
+ * @since : 0.1.0
+ **/
 public class PurchaseOrderBOImpl implements PurchaseOrderBO {
 
-    private final CustomerDAO customerDAO = new CustomerDAOImpl();
-
-    ItemDAO itemDAO = (ItemDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ITEM);
-    OrderDAO orderDAO = (OrderDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ORDER);
-    OrderDetailsDAO orderDetailsDAO = (OrderDetailsDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ORDERDETAILS);
+    private final ItemDAO itemDAO = (ItemDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ITEM);
+    private final OrderDAO orderDAO = (OrderDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ORDER);
+    private final OrderDetailsDAO orderDetailsDAO = (OrderDetailsDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ORDERDETAILS);
 
     @Override
-    public boolean purchaseOrder(Orders order, ArrayList<OrderDetails> orderDetails) throws Exception {
-
-
-
-
-
-        Connection connection=null;
-
+    public boolean purchaseOrder(OrdersDTO dto) throws Exception {
+        Connection connection = null;
         try {
+            connection = DBConnection.getInstance().getConnection();
+            connection.setAutoCommit(false);
 
 
-       connection = DBConnection.getInstance().getConnection();
-        connection.setAutoCommit(false);
-        boolean b1 = orderDAO.add(order);
-        if (!b1) {
-            connection.rollback();
-            return false;
-        }
-        for (OrderDetails orderDetail : orderDetails) {
-            boolean b2 = orderDetailsDAO.add(orderDetail);
+            Orders orders = new Orders(dto.getId(),dto.getDate(),dto.getCustomerId());
+            boolean b1 = orderDAO.add(orders);
 
-            if (!b2) {
+            if (!b1) {
                 connection.rollback();
                 return false;
             }
 
-            int qtyOnHand = 0;
+            for (OrderDetailsDTO orderDetails : dto.getOrderDetails()) {
 
-            Item item = itemDAO.search(orderDetail.getItemCode());
+                OrderDetails oDetails = new OrderDetails(orderDetails.getOrderId(),orderDetails.getItemCode(),orderDetails.getQty(),orderDetails.getUnitPrice());
+                boolean b2 = orderDetailsDAO.add(oDetails);
+                if (!b2) {
+                    connection.rollback();
+                    return false;
+                }
 
-            if (item != null) {
-                qtyOnHand = item.getQtyOnHand();
+                int qtyOnHand = 0;
+                Item item = itemDAO.search(orderDetails.getItemCode());
+                if (item != null) {
+                    qtyOnHand = item.getQtyOnHand();
+                }
+                boolean b = itemDAO.updateItemQtyOnHand(orderDetails.getItemCode(), qtyOnHand - orderDetails.getQty());
+                if (!b) {
+                    connection.rollback();
+                    return false;
+                }
             }
-
-            boolean b = itemDAO.updateItemQtyOnHand(orderDetail.getItemCode(), qtyOnHand - orderDetail.getQty());
-
-            if (!b) {
-                connection.rollback();
-                return false;
-            }
-        }
-
-        connection.commit();
-
-
+            connection.commit();
+            return true;
 
         } catch (SQLException ex) {
             try {
                 connection.rollback();
             } catch (SQLException ex1) {
-                Logger.getLogger(OrderFormController.class.getName()).log(Level.SEVERE, null, ex1);
+                throw new Exception(ex1);
             }
-            Logger.getLogger(OrderFormController.class.getName()).log(Level.SEVERE, null, ex);
+            throw new Exception(ex);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception(e);
         } finally {
             try {
                 connection.setAutoCommit(true);
-
             } catch (SQLException ex) {
-                Logger.getLogger(OrderFormController.class.getName()).log(Level.SEVERE, null, ex);
+                throw new Exception(ex);
             }
-            return true;
         }
-
     }
+
 }

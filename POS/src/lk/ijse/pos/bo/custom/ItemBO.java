@@ -1,21 +1,22 @@
 package lk.ijse.pos.bo.custom;
 
 import lk.ijse.pos.bo.SuperBO;
-import lk.ijse.pos.model.Item;
+import lk.ijse.pos.dto.ItemDTO;
+import lk.ijse.pos.entity.Item;
 
 import java.util.ArrayList;
 
+
 public interface ItemBO extends SuperBO {
+    boolean addItem(ItemDTO item) throws Exception;
 
-    public boolean addItem(Item item) throws Exception;
+    boolean deleteItem(String code) throws Exception;
 
-    public boolean deleteItem(String code) throws Exception;
+    boolean updateItem(ItemDTO item) throws Exception;
 
-    public boolean updateItem(Item item) throws Exception ;
+    ItemDTO searchItem(String code) throws Exception;
 
-    public Item searchItem(String code) throws Exception;
+    ArrayList<ItemDTO> getAllItems() throws Exception;
 
-    public ArrayList<Item> getAllItems() throws Exception;
-
-    public boolean updateItemQtyOnHand(String code,int qtyOnHand) throws Exception;
+    boolean updateItemQtyOnHand(String code, int qtyOnHand)throws Exception;
 }

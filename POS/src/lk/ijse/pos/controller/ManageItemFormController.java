@@ -18,10 +18,9 @@ import javafx.stage.Stage;
 import lk.ijse.pos.AppInitializer;
 import lk.ijse.pos.bo.BOFactory;
 import lk.ijse.pos.bo.custom.ItemBO;
-import lk.ijse.pos.bo.custom.impl.ItemBOImpl;
-import lk.ijse.pos.model.Item;
+import lk.ijse.pos.dto.ItemDTO;
+import lk.ijse.pos.entity.Item;
 import lk.ijse.pos.view.tblmodel.ItemTM;
-
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -30,15 +29,11 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author : Sanu Vithanage
- * @since : 0.1.0
- **/
 
 
 public class ManageItemFormController implements Initializable {
 
-    ItemBO itemBO= (ItemBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ITEM);
+
 
     @FXML
     private JFXTextField txtItemCode;
@@ -52,28 +47,22 @@ public class ManageItemFormController implements Initializable {
     private AnchorPane root;
     @FXML
     private TableView<ItemTM> tblItems;
-
     private boolean addNew = true;
 
-
+    private ItemBO itemBO = (ItemBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ITEM);
 
     private void loadAllItems() {
 
         try {
             /*Get All Items*/
-
-            ArrayList<Item> allItems = itemBO.getAllItems();
-
+            ArrayList<ItemDTO> allItems = itemBO.getAllItems();
             /*create a ItemTM type list*/
             ArrayList<ItemTM> allItemsForTable = new ArrayList<>();
-
-            for (Item i : allItems) {
+            for (ItemDTO i : allItems) {
                 allItemsForTable.add(new ItemTM(i.getCode(), i.getDescription(), i.getUnitPrice(), i.getQtyOnHand()));
             }
-
             ObservableList<ItemTM> olItems = FXCollections.observableArrayList(allItemsForTable);
             tblItems.setItems(olItems);
-
         } catch (Exception ex) {
             Logger.getLogger(ManageItemFormController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -109,9 +98,7 @@ public class ManageItemFormController implements Initializable {
                 txtDescription.setText(newValue.getDescription());
                 txtUnitPrice.setText(newValue.getUnitPrice().toPlainString());
                 txtQty.setText(newValue.getQtyOnHand() + "");
-
                 addNew = false;
-
             }
         });
     }
@@ -130,23 +117,17 @@ public class ManageItemFormController implements Initializable {
 
     @FXML
     private void btnAddNewItem_OnAction(ActionEvent event) {
-
         tblItems.getSelectionModel().clearSelection();
         txtItemCode.requestFocus();
         addNew = true;
-
     }
 
     @FXML
     private void btnSave_OnAction(ActionEvent event) {
-
         if (addNew) {
-
             try {
-
                 /*Add Item*/
-
-                Item item = new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText()));
+                ItemDTO item = new ItemDTO(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText()));
                 boolean b = itemBO.addItem(item);
                 if (b) {
                     loadAllItems();
@@ -157,15 +138,11 @@ public class ManageItemFormController implements Initializable {
                 Logger.getLogger(ManageItemFormController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-
         } else {
-
             try {
                 /*Update Item*/
-
-                Item item = new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText()));
-                boolean b = itemBO.addItem(item);
-
+                ItemDTO item = new ItemDTO(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText()));
+                boolean b = itemBO.updateItem(item);
                 if (b) {
                     loadAllItems();
                 } else {
@@ -174,8 +151,6 @@ public class ManageItemFormController implements Initializable {
             } catch (Exception ex) {
                 Logger.getLogger(ManageItemFormController.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-
         }
 
 
@@ -185,12 +160,10 @@ public class ManageItemFormController implements Initializable {
     private void btnDelete_OnAction(ActionEvent event) {
 
         if (tblItems.getSelectionModel().getSelectedIndex() == -1) return;
-
         String code = tblItems.getSelectionModel().getSelectedItem().getCode();
 
         try {
             /*Delete Item*/
-
             boolean b = itemBO.deleteItem(code);
             if (b) {
                 loadAllItems();
@@ -201,5 +174,5 @@ public class ManageItemFormController implements Initializable {
             Logger.getLogger(ManageItemFormController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-}
 
+}

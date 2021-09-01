@@ -18,8 +18,8 @@ import javafx.stage.Stage;
 import lk.ijse.pos.AppInitializer;
 import lk.ijse.pos.bo.BOFactory;
 import lk.ijse.pos.bo.custom.CustomerBO;
-import lk.ijse.pos.bo.custom.impl.CustomerBOImpl;
-import lk.ijse.pos.model.Customer;
+import lk.ijse.pos.dto.CustomerDTO;
+import lk.ijse.pos.entity.Customer;
 import lk.ijse.pos.view.tblmodel.CustomerTM;
 
 import java.net.URL;
@@ -30,9 +30,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+
 public class ManageCustomerFormController implements Initializable {
 
     boolean addnew = true;
+
     @FXML
     private AnchorPane root;
     @FXML
@@ -44,18 +46,18 @@ public class ManageCustomerFormController implements Initializable {
     @FXML
     private TableView<CustomerTM> tblCustomers;
 
-
-  CustomerBO customerBO = (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
+    private final CustomerBO customerBO = (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
 
     private void loadAllCustomers() {
+
         try {
+            /*  get all customers*/
 
-
-            ArrayList<Customer> allCustomers = customerBO.getAllCustomers();
+            ArrayList<CustomerDTO> allCustomers = this.customerBO.getAllCustomers();
             ArrayList<CustomerTM> allCustomersForTable = new ArrayList<>();
 
-            for (Customer customer : allCustomers) {
-                allCustomersForTable.add(new CustomerTM(customer.getcID(), customer.getName(), customer.getAddress()));
+            for (CustomerDTO customer : allCustomers) {
+                allCustomersForTable.add(new CustomerTM(customer.getId(), customer.getName(), customer.getAddress()));
             }
             ObservableList<CustomerTM> olCustomers = FXCollections.observableArrayList(allCustomersForTable);
             tblCustomers.setItems(olCustomers);
@@ -66,7 +68,9 @@ public class ManageCustomerFormController implements Initializable {
         }
     }
 
-
+    /**
+     * Initializes the controller class.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         tblCustomers.getColumns().get(0).setStyle("-fx-alignment:center");
@@ -113,8 +117,7 @@ public class ManageCustomerFormController implements Initializable {
             String customerID = tblCustomers.getSelectionModel().getSelectedItem().getId();
 
             try {
-
-
+                /*Delete operation*/
                 boolean b = customerBO.deleteCustomer(customerID);
 
                 if (b) {
@@ -141,7 +144,6 @@ public class ManageCustomerFormController implements Initializable {
     private void btnAddNewCustomer_OnAction(ActionEvent event) {
         txtCustomerId.requestFocus();
         tblCustomers.getSelectionModel().clearSelection();
-
         addnew = true;
     }
 
@@ -150,9 +152,8 @@ public class ManageCustomerFormController implements Initializable {
 
         if (addnew) {
             try {
-
-
-                boolean b = customerBO.addCustomer(new Customer(txtCustomerId.getText(), txtCustomerName.getText(), txtCustomerAddress.getText()));
+                /* Add Operation*/
+                boolean b = customerBO.addCustomer(new CustomerDTO(txtCustomerId.getText(), txtCustomerName.getText(), txtCustomerAddress.getText()));
                 if (b) {
                     loadAllCustomers();
                 } else {
@@ -164,9 +165,8 @@ public class ManageCustomerFormController implements Initializable {
 
         } else {
             try {
-
-
-                boolean b = customerBO.updateCustomer(new Customer(txtCustomerId.getText(), txtCustomerName.getText(), txtCustomerAddress.getText()));
+                //Update Operation
+                boolean b = customerBO.updateCustomer(new CustomerDTO(txtCustomerId.getText(), txtCustomerName.getText(), txtCustomerAddress.getText()));
                 if (b) {
                     loadAllCustomers();
                 } else {

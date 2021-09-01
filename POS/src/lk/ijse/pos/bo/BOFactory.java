@@ -3,7 +3,7 @@ package lk.ijse.pos.bo;
 import lk.ijse.pos.bo.custom.impl.CustomerBOImpl;
 import lk.ijse.pos.bo.custom.impl.ItemBOImpl;
 import lk.ijse.pos.bo.custom.impl.PurchaseOrderBOImpl;
-import lk.ijse.pos.dao.SuperDAO;
+
 
 public class BOFactory{
 
